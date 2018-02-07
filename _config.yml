@@ -61,9 +61,9 @@ kramdown:
 # Gitalk
 gitalk:
   enable: true    #是否开启Gitalk评论
-  clientID: d28b6c9e00bd27a2e116   #生成的clientID
-  clientSecret: 35728a83ca07a7288548f3221dbc37b4d4e74fd6  #同上
-  repo: https://sundyhy.github.io/    #仓库名称
+  clientID: f2ded232c4522c58079a   #生成的clientID
+  clientSecret: 93109486690dd70ee22b09a4a76395076a53d729  #同上
+  repo: sundyhy.github.io    #仓库名称
   owner: sundyhy    #github用户名
   admin: sundyhy
   distractionFreeMode: true #是否启用类似FB的阴影遮罩
@@ -73,11 +73,11 @@ gitalk:
 
 # Analytics settings
 # Baidu Analytics
-ba_track_id: b50bf2b12b5338a1845e33832976fd68
+#ba_track_id: b50bf2b12b5338a1845e33832976fd68
 
 # Google Analytics
 ga_track_id: 'UA-90855596-1'            # Format: UA-xxxxxx-xx
-ga_domain: qiubaiying.top               # 默认的是 auto, 这里我是自定义了的域名，你如果没有自己的域名，需要改成auto
+ga_domain: auto               # 默认的是 auto, 这里我是自定义了的域名，你如果没有自己的域名，需要改成auto
 
 
 
