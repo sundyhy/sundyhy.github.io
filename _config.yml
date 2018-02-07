@@ -63,7 +63,7 @@ gitalk:
   enable: true    #是否开启Gitalk评论
   clientID: f2ded232c4522c58079a   #生成的clientID
   clientSecret: 93109486690dd70ee22b09a4a76395076a53d729  #同上
-  repo: https://github.com/sundyhy/sundyhy.github.io    #仓库名称
+  repo: sundyhy.github.io    #仓库名称
   owner: sundyhy    #github用户名
   admin: sundyhy
   distractionFreeMode: true #是否启用类似FB的阴影遮罩
