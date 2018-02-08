@@ -16,10 +16,12 @@ tags:
 >Android端句柄泄露调查
 
 ## 句柄
+
 句柄(file descriptor)即文件描述符，具体解释详见[File descriptor](https://en.wikipedia.org/wiki/File_descriptor)解释，以下简称fd。在android系统中，每个进程最多可以使用1024个fd, 任何一个IO操作都会使用一个fd，比如socket, open file , pipe等等。
 
 
 ## 句柄泄露
+
 句柄泄露是指程序中已分配的fd由于某种原因未释放或者无法释放，造成fd句柄占用越来越多，当达到上限1024后，程序将发生崩溃。常见的句柄泄露崩溃可能有如下错误日志：
 
 - Could not read input channel file descriptors from parcel 	
@@ -27,12 +29,15 @@ tags:
 - file descriptor >= FD_SETSIZE
 
 ## 句柄泄漏调查
+
 在我们android YY中，近期发现句柄泄露的问题较严重，故专门针对句柄泄露做了个调查，下面分享一下调查过程。
 
 ### 1 准备设备
+
 调查中部分操作需要使用到root权限，故需要准备一台root过的手机，如果没有root的手机，推荐使用多玩模拟器代替。
 
 ### 2 确定问题
+
 针对怀疑的操作过程，反复操作，确定句柄数是否上涨，在android系统中，/proc/pid/为当前进程的一些状态描述信息，/proc/pid/fd下面为句柄信息，一般可通过两种方式查看：
 
 - 在adb shell中，可通过ls -all /proc/{pid}/fd查看句柄信息，执行该操作需要root后的手机
@@ -53,6 +58,7 @@ tags:
 首先保存开始测试时当前的句柄信息到文件，然后开始测试，等测试结束时，再保存对应的句柄信息到文件，对比两个文件的差别，查看增加是否明显，有明显增加，表明存在句柄泄漏。
 
 ### 3 调查泄漏的句柄类型
+
 通过步骤2，可以得到增加的句柄信息，常见的内容如下：
 
     		28 -> /system/framework/smartfaceservice.jar
@@ -75,6 +81,7 @@ tags:
 
 
 ### 4 查找泄漏的代码位置
+
 我们知道，存在泄漏是因为打开了未关闭导致一直增加，那我们要查找具体的代码位置，可以监控每次句柄的创建跟关闭，最后查看剩下的是什么地方创建的即可。在这里可以一类一类追踪，比如针对socket句柄，可以监控socket及socketpair函数来调查、针对pipe可以监控pipe函数来调查，所有句柄关闭均调用libc的close函数，统一监控。
 
 我们调查中统一使用hook 对应函数的方式进行监控，[这里](http://code.yy.com/dw_zhangdeheng/elfhook)为我自己实现的一个小的hook库，无依赖，直接加载so即可，主要函数为：
@@ -97,6 +104,7 @@ tags:
 可以看出，泄漏的pipe是由Looper使用，它是在Looper.prepare的时候创建，这里Throwable里面的字符串为我们自己输出的线程名，可以看出线程为YY_IN_LIKEVIEW，由线程名可以定位到具体代码为小视频LinkView的DrawThread。
 
 ### 5 分析泄漏原因
+
 查看DrawThread代码， DrawThread为一个HandlerThread， 初步调查并无异常，并且每次退出有调用quit，进一步分析DrawThread，会发现存在一个可疑对象ValueAnimator， ValueAnimator一般为主线程使用，而这里在非主线程使用是否会存在问题，于是测试去掉ValueAnimator，发现句柄不再泄漏，那可以确定就是ValueAnimator的问题。
 
 接下来查看ValueAnimator源码：
@@ -159,6 +167,7 @@ Choreographer如下：
 
 	
 ### 6 修复问题：
+
 从五可以知道ValueAnimator都会导致对应的线程looper被保存，而只有主线程的looper是不会退出的，因此，ValueAnimator只能在主线程调用，相关操作全部改为主线程执行即可。
 
 
