@@ -7,25 +7,26 @@ author:     DEH000
 header-img: img/post-bg-re-vs-ng2.jpg
 catalog: true
 tags:
-    - Android
-    - 句柄
-    - 泄露
-    - 内存泄露
+    - Android
+    - 句柄
+    - 泄露
+    - 内存泄露
 ---
->句柄泄露调查
 
-# 句柄
+>Android端句柄泄露调查
+
+## 句柄
 句柄(file descriptor)即文件描述符，具体解释详见[File descriptor](https://en.wikipedia.org/wiki/File_descriptor)解释，以下简称fd。在android系统中，每个进程最多可以使用1024个fd, 任何一个IO操作都会使用一个fd，比如socket, open file , pipe等等。
 
 
-# 句柄泄露
+## 句柄泄露
 句柄泄露是指程序中已分配的fd由于某种原因未释放或者无法释放，造成fd句柄占用越来越多，当达到上限1024后，程序将发生崩溃。常见的句柄泄露崩溃可能有如下错误日志：
 
 - Could not read input channel file descriptors from parcel 	
 - Too many open files 	
 - file descriptor >= FD_SETSIZE
 
-# 句柄泄漏调查
+## 句柄泄漏调查
 在我们android YY中，近期发现句柄泄露的问题较严重，故专门针对句柄泄露做了个调查，下面分享一下调查过程。
 
 ### 1 准备设备
