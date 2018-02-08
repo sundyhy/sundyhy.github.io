@@ -15,9 +15,6 @@ tags:
 
 >Android端句柄泄露调查
 
-
-## 为终端添加一个快捷键打开方式
-
 ## 句柄
 
 句柄(file descriptor)即文件描述符，具体解释详见[File descriptor](https://en.wikipedia.org/wiki/File_descriptor)解释，以下简称fd。在android系统中，每个进程最多可以使用1024个fd, 任何一个IO操作都会使用一个fd，比如socket, open file , pipe等等。
